@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.model_selection import (
+    train_test_split, GridSearchCV,cross_val_score)
 import plotly.express as px
 from sklearn.metrics import mean_squared_error
 
@@ -60,21 +61,31 @@ df = pd.read_csv(file_path)
 #
 # plot_lmplot(df, x='USD_CAP', y='PC_GDP')
 
+
 X = df[['USD_CAP']]
 y = df['PC_GDP']
-
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
-model = LinearRegression()
+ridge = Ridge()
 
 
-model.fit(X_train, y_train)
+param_grid = {'alpha': [0.1, 1, 10]}  # Adjust the range of alpha values
 
 
-y_pred = model.predict(X_test)
+grid_search = GridSearchCV(ridge, param_grid, cv=5, scoring='neg_mean_squared_error')
+
+# Fit the grid search to the training data
+grid_search.fit(X_train, y_train)
+
+
+best_alpha = grid_search.best_params_['alpha']
+print("Best Alpha:", best_alpha)
+
+
+best_model = grid_search.best_estimator_
+y_pred = best_model.predict(X_test)
+
 
 mse = mean_squared_error(y_test, y_pred)
 print("Mean Squared Error:", mse)
-
