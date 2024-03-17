@@ -7,6 +7,7 @@ import statsmodels.api as sm
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import plotly.express as px
+from sklearn.metrics import mean_squared_error
 
 file_path = '/Users/andrey/Downloads/data_csv.csv'
 df = pd.read_csv(file_path)
@@ -43,19 +44,37 @@ df = pd.read_csv(file_path)
 # plt.tight_layout()
 # plt.show()
 
+#
+# def plot_lmplot(df, x, y):
+#     plt.figure(figsize=(12, 8))
+#     sns.lmplot(data=df, x=x, y=y,
+#                height=8, aspect=1.5,
+#                scatter_kws={'s': 50, 'alpha': 0.5},
+#                line_kws={'lw': 2})
+#     plt.xlabel('USD per Capita')
+#     plt.ylabel('% of GDP')
+#     plt.title('Linear Regression of USD_CAP vs PC_GDP')
+#     plt.tight_layout()
+#     plt.show()
+#
+#
+# plot_lmplot(df, x='USD_CAP', y='PC_GDP')
 
-def plot_lmplot(df, x, y):
-    plt.figure(figsize=(12, 8))
-    sns.lmplot(data=df, x=x, y=y,
-               height=8, aspect=1.5,
-               scatter_kws={'s': 50, 'alpha': 0.5},
-               line_kws={'lw': 2})
-    plt.xlabel('USD per Capita')
-    plt.ylabel('% of GDP')
-    plt.title('Linear Regression of USD_CAP vs PC_GDP')
-    plt.tight_layout()
-    plt.show()
+X = df[['USD_CAP']]
+y = df['PC_GDP']
 
 
-plot_lmplot(df, x='USD_CAP', y='PC_GDP')
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+model = LinearRegression()
+
+
+model.fit(X_train, y_train)
+
+
+y_pred = model.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+print("Mean Squared Error:", mse)
 
