@@ -21,35 +21,24 @@ X = df[['USD_CAP']]
 y = df['PC_GDP']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-
 ridge = Ridge()
-
-
-param_grid = {'alpha': [0.1, 1, 10]}  # Adjust the range of alpha values
-
-
+param_grid = {'alpha': [0.1, 1, 10]}
 grid_search = GridSearchCV(ridge, param_grid, cv=5, scoring='neg_mean_squared_error')
-
-
 grid_search.fit(X_train, y_train)
 
 
 best_alpha = grid_search.best_params_['alpha']
-print("Best Alpha:", best_alpha)
-
-
 best_model = grid_search.best_estimator_
 y_pred = best_model.predict(X_test)
-print("Best Model:", best_model)
 
 
 mse = mean_squared_error(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
-
-print("Mean Squared Error:", mse)
-print("Mean Absolute Error:", mae)
-print("R^2 Score:", r2)
+print(f"""Best Alpha: {best_alpha}
+Mean Squared Error: {mse}
+Mean Absolute Error: {mae}
+R^2 Score: {r2}""")
 
 
 plt.scatter(X_test, y_test, color='blue', label='Actual')
