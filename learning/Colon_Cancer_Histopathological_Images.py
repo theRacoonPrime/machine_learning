@@ -240,3 +240,31 @@ for i, ax in enumerate(axis.flat):
 testimage_sample , testlabel_sample = next(iter(test_dataloader))
 testimage_sample.shape , testlabel_sample.shape
 
+
+fig, axis = plt.subplots(3, 5, figsize=(15, 10))
+for i, ax in enumerate(axis.flat):
+    with torch.no_grad():
+        img = testimage_sample[i].numpy()
+        img = np.transpose(img, (1, 2, 0))
+        ax.imshow(img)
+        ax.set(title = f"{getlabel(testlabel_sample[i])}")
+        ax.axis('off')
+
+print(f"the size of the pred dataloader {len(pred_dataloader)}")
+
+predimage_sample = next(iter(pred_dataloader))
+predimage_sample.shape
+
+fig, axis = plt.subplots(3, 5, figsize=(15, 10))
+for i, ax in enumerate(axis.flat):
+    with torch.no_grad():
+        img = predimage_sample[i].numpy()
+        img = np.transpose(img, (1, 2, 0))
+        ax.imshow(img)
+        ax.axis('off')
+
+
+def param_count(model):
+    params = [p.numel() for p in model.parameters() if p.requires_grad]
+    print('Total number of parameters : ', sum(params))
+
