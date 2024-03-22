@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from tqdm.auto import tqdm
 import matplotlib.pyplot as plt
-# import cv2
+import cv2
 from PIL import Image
 import os
 import glob as gb

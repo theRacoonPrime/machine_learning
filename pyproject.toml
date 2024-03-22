@@ -15,6 +15,9 @@ scipy = "^1.12.0"
 statsmodels = "^0.14.1"
 scikit-learn = "^1.4.1.post1"
 linearregression = "^0.0.1"
+opencv-python-headless = "^4.9.0.80"
+cv = "^1.0.0"
+opencv-python = "^4.9.0.80"
 
 
 
