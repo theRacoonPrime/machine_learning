@@ -23,7 +23,7 @@ mae_list = []
 r2_list = []
 
 
-fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(20, 20))
+fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(20, 20))
 axes = axes.flatten()
 
 
