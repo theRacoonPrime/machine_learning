@@ -17,6 +17,7 @@ scikit-learn = "^1.4.1.post1"
 linearregression = "^0.0.1"
 
 
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
