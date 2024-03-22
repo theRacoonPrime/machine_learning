@@ -238,7 +238,6 @@ for i, ax in enumerate(axis.flat):
 
 
 testimage_sample , testlabel_sample = next(iter(test_dataloader))
-testimage_sample.shape , testlabel_sample.shape
 
 
 fig, axis = plt.subplots(3, 5, figsize=(15, 10))
@@ -250,7 +249,6 @@ for i, ax in enumerate(axis.flat):
         ax.set(title = f"{getlabel(testlabel_sample[i])}")
         ax.axis('off')
 
-print(f"the size of the pred dataloader {len(pred_dataloader)}")
 
 predimage_sample = next(iter(pred_dataloader))
 predimage_sample.shape
@@ -268,3 +266,148 @@ def param_count(model):
     params = [p.numel() for p in model.parameters() if p.requires_grad]
     print('Total number of parameters : ', sum(params))
 
+
+class CNN(nn.Module):
+    def __init__(self, input_shape, output):
+        super().__init__()
+        self.block1 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=input_shape,
+                out_channels=32,
+                kernel_size=(3, 3),
+                stride=2,
+                padding=1
+            ),
+
+            nn.ReLU(),
+
+            nn.Conv2d(
+                in_channels=32,
+                out_channels=64,
+                kernel_size=(3, 3),
+                stride=2,
+                padding=1
+            ),
+
+            nn.ReLU(),
+
+            nn.MaxPool2d(kernel_size=2)
+        )
+
+        self.block2 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=128,
+                kernel_size=(3, 3),
+                stride=2,
+                padding=1
+            ),
+
+            nn.ReLU(),
+
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=256,
+                kernel_size=(3, 3),
+                stride=2,
+                padding=1
+            ),
+
+            nn.ReLU(),
+
+            nn.MaxPool2d(kernel_size=2)
+        )
+
+        self.fully_connected_layer = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(in_features=256 * 4 * 4
+                      , out_features=output)
+        )
+
+    def forward(self, x):
+        x = self.block1(x)
+        #         print(f"The output shape of conv block1 is : {x.shape}\n\n")
+        x = self.block2(x)
+        #         print(f"The output shape of conv block2 is : {x.shape}\n\n")
+        x = self.fully_connected_layer(x)
+        return x
+
+
+torch.manual_seed(42)
+model=CNN(
+    input_shape = 3 ,
+    output=len(classes)
+)
+
+in_shape = (3, 250, 250)
+
+criterion=nn.CrossEntropyLoss()
+optimizer=Adam(model.parameters(),lr=0.001)
+
+epochs = 10
+training_acc = []
+training_loss = []
+
+for i in tqdm(range(epochs)):
+    epoch_loss = 0
+    epoch_acc = 0
+
+    for batch, (x_train, y_train) in enumerate(train_dataloader):
+        y_pred = model.forward(x_train)
+
+        loss = criterion(y_pred, y_train)
+
+        if batch % 100 == 0:
+            print(f"Looked at {batch * len(x_train)}/{len(train_dataloader.dataset)} samples.")
+
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+        epoch_loss += loss
+        epoch_acc += accuracy_score(y_train, y_pred.argmax(dim=1))
+
+    training_loss.append((epoch_loss / len(train_dataloader)).detach().numpy())
+    training_acc.append(epoch_acc / len(train_dataloader))
+
+    print(
+        f"Epoch {i}: Accuracy: {(epoch_acc / len(train_dataloader)) * 100}, Loss: {(epoch_loss / len(train_dataloader))}\n\n")
+
+
+plt.subplots(figsize=(6,4))
+plt.plot(range(epochs),training_loss,color="blue",label="Loss")
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+plt.subplots(figsize=(6,4))
+plt.plot(range(epochs),training_acc,color="green",label="Accuracy")
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+test_loss = 0
+test_acc = 0
+test_preds = []
+test_targets = []
+torch.manual_seed(42)
+with torch.no_grad():
+    for x_test, y_test in test_dataloader:
+        y_pred = model.forward(x_test)
+        test_pred = torch.softmax(y_pred, dim=1).argmax(dim=1)
+        test_preds.append(test_pred)
+        test_targets.extend(y_test)
+
+        loss = criterion(y_pred, y_test)
+        test_loss += loss
+        test_acc += accuracy_score(y_test, y_pred.argmax(dim=1))
+
+test_loss /= len(test_dataloader)
+test_acc /= len(test_dataloader)
+test_preds = torch.cat(test_preds)
+test_targets = torch.Tensor(test_targets)
+
+print(f"The loss of the testing set is : {test_loss}\n")
+print(f"The accuracy of the testing set is : {(test_acc*100):0.2f}%\n")
