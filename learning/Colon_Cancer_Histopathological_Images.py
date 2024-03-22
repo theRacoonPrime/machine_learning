@@ -29,25 +29,23 @@ from sklearn.model_selection import train_test_split
 
 
 def walk_through_data(dir_path) :
-    for dirpath , dirnames , filenames in tqdm(os.walk(dir_path)) :
+    for dirpath, dirnames, filenames in tqdm(os.walk(dir_path)):
         print(f"There are {len(dirnames)} directions and {len(filenames)} images in {dirpath}")
 
 
-dataset_path='/Users/andrey/Downloads/lung_colon_image_set'
+dataset_path = '/Users/andrey/Downloads/lung_colon_image_set'
 pred_path = 'lung_colon_image_prediction_set'
 
 walk_through_data(dataset_path)
 walk_through_data(pred_path)
 
-
-extension=[]
-for cat in tqdm(os.listdir(dataset_path)) :
-    for folder in os.listdir(dataset_path + "/" + cat) :
-        for file in os.listdir(dataset_path + "/" + cat + "/" + folder + "/") :
-            if os.path.isfile(dataset_path + "/" + cat + "/" + folder + "/" + file) :
+extension = []
+for cat in tqdm(os.listdir(dataset_path)):
+    for folder in os.listdir(dataset_path + "/" + cat):
+        for file in os.listdir(dataset_path + "/" + cat + "/" + folder + "/"):
+            if os.path.isfile(dataset_path + "/" + cat + "/" + folder + "/" + file):
                 extension.append(os.path.splitext(file)[1])
 
-print(len(extension),np.unique(extension))
 
 categories = []
 classes = []
@@ -60,19 +58,19 @@ for cat in tqdm(os.listdir(dataset_path)):
             classes.append(folder)
 
 
-img_label={}
-for key in categories :
-    dic={}
-    for value in classes :
-        if key in value :
-            dic[value]=classes.index(value)
-    img_label[key]=dic
+img_label = {}
+for key in categories:
+    dic = {}
+    for value in classes:
+        if key in value:
+            dic[value] = classes.index(value)
+    img_label[key] = dic
 
 
-def getlabel(n) :
-    for i, j in img_label.items() :
-        for x, y in j.items() :
-            if n==y :
+def getlabel(n):
+    for i, j in img_label.items():
+        for x, y in j.items():
+            if n == y:
                 return i, x
 
 
@@ -84,6 +82,23 @@ for cat in tqdm(os.listdir(dataset_path)):
 
 
 img_per_class = pd.DataFrame(num_of_disease.values(),
-                             index = num_of_disease.keys(),
-                             columns=["# of images"]
-                            )
+                             index=num_of_disease.keys(), columns=["# of images"])
+
+
+idx = [i for i in range(len(classes))]
+plt.figure(figsize=(20, 10))
+plt.bar(idx, [n for n in num_of_disease.values()], width=0.5)
+plt.xlabel('Plant/Disease', fontsize=10)
+plt.ylabel('# of images')
+plt.xticks(idx, classes, fontsize=5, rotation=90)
+plt.title('Images per each class of plant disease')
+
+
+dataset_path_list=[]
+dataset_labels=[]
+for cat in tqdm(os.listdir(dataset_path)) :
+    for folder in os.listdir(dataset_path + "/" + cat) :
+        files=gb.glob(pathname = str(dataset_path + "/" + cat + "/" + folder + "/*.jpeg"))
+        for file in files :
+            dataset_path_list.append(file)
+            dataset_labels.append(img_label[cat.replace('_image_sets','')][folder])
