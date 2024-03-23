@@ -1,43 +1,39 @@
 import warnings
-warnings.filterwarnings('ignore')
-
 import pandas as pd
 import numpy as np
 from tqdm.auto import tqdm
 import matplotlib.pyplot as plt
-import cv2
 from PIL import Image
 import os
 import glob as gb
-
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.optim import Adam , lr_scheduler
-import torchvision
-from torchvision import datasets
+from torch.optim import Adam
 import torchvision.transforms as transforms
-from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-from torchsummary import summary
 from torchmetrics import ConfusionMatrix
 from mlxtend.plotting import plot_confusion_matrix
-
-from sklearn.metrics import accuracy_score , precision_score , recall_score , f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 
+# Suppress warnings
+warnings.filterwarnings('ignore')
 
-def walk_through_data(dir_path) :
+
+# Function to debug image loading issues
+def debug_image_loading(dir_path):
     for dirpath, dirnames, filenames in tqdm(os.walk(dir_path)):
-        print(f"There are {len(dirnames)} directions and {len(filenames)} images in {dirpath}")
+        print(f"There are {len(dirnames)} directories and {len(filenames)} images in {dirpath}")
 
 
+# Define dataset and prediction paths
 dataset_path = '/Users/andrey/Downloads/lung_colon_image_set'
 pred_path = '/Users/andrey/Downloads/lung_colon_image_set'
 
-walk_through_data(dataset_path)
-walk_through_data(pred_path)
+# Debug image loading issues
+debug_image_loading(dataset_path)
+debug_image_loading(pred_path)
 
 extension = []
 for cat in tqdm(os.listdir(dataset_path)):
@@ -45,7 +41,6 @@ for cat in tqdm(os.listdir(dataset_path)):
         for file in os.listdir(dataset_path + "/" + cat + "/" + folder + "/"):
             if os.path.isfile(dataset_path + "/" + cat + "/" + folder + "/" + file):
                 extension.append(os.path.splitext(file)[1])
-
 
 categories = []
 classes = []
@@ -56,7 +51,6 @@ for cat in tqdm(os.listdir(dataset_path)):
     for folder in os.listdir(dataset_path + "/" + cat):
         if folder not in classes:
             classes.append(folder)
-
 
 img_label = {}
 for key in categories:
@@ -80,19 +74,8 @@ for cat in tqdm(os.listdir(dataset_path)):
     for folder in os.listdir(dataset_path + "/" + cat):
         num_of_disease[folder] = len(os.listdir(dataset_path + "/" + cat + "/" + folder))
 
-
 img_per_class = pd.DataFrame(num_of_disease.values(),
                              index=num_of_disease.keys(), columns=["# of images"])
-
-
-idx = [i for i in range(len(classes))]
-plt.figure(figsize=(20, 10))
-plt.bar(idx, [n for n in num_of_disease.values()], width=0.5)
-plt.xlabel('Plant/Disease', fontsize=10)
-plt.ylabel('# of images')
-plt.xticks(idx, classes, fontsize=5, rotation=90)
-plt.title('Images per each class of plant disease')
-
 
 dataset_path_list = []
 dataset_labels = []
@@ -102,7 +85,6 @@ for cat in tqdm(os.listdir(dataset_path)):
         for file in files:
             dataset_path_list.append(file)
             dataset_labels.append(img_label[cat.replace('_image_sets', '')][folder])
-
 
 pred_path_list = []
 pred_labels = []
@@ -222,10 +204,7 @@ pred_dataloader = DataLoader(
     shuffle=False
 )
 
-
 trainimage_sample, trainlabel_sample = next(iter(train_dataloader))
-trainimage_sample.shape, trainlabel_sample.shape
-
 
 fig, axis = plt.subplots(3, 5, figsize=(15, 10))
 for i, ax in enumerate(axis.flat):
@@ -236,9 +215,7 @@ for i, ax in enumerate(axis.flat):
         ax.set(title=f"{getlabel(trainlabel_sample[i])}")
         ax.axis('off')
 
-
-testimage_sample , testlabel_sample = next(iter(test_dataloader))
-
+testimage_sample, testlabel_sample = next(iter(test_dataloader))
 
 fig, axis = plt.subplots(3, 5, figsize=(15, 10))
 for i, ax in enumerate(axis.flat):
@@ -246,12 +223,10 @@ for i, ax in enumerate(axis.flat):
         img = testimage_sample[i].numpy()
         img = np.transpose(img, (1, 2, 0))
         ax.imshow(img)
-        ax.set(title = f"{getlabel(testlabel_sample[i])}")
+        ax.set(title=f"{getlabel(testlabel_sample[i])}")
         ax.axis('off')
 
-
 predimage_sample = next(iter(pred_dataloader))
-predimage_sample.shape
 
 fig, axis = plt.subplots(3, 5, figsize=(15, 10))
 for i, ax in enumerate(axis.flat):
@@ -326,23 +301,21 @@ class CNN(nn.Module):
 
     def forward(self, x):
         x = self.block1(x)
-        #         print(f"The output shape of conv block1 is : {x.shape}\n\n")
         x = self.block2(x)
-        #         print(f"The output shape of conv block2 is : {x.shape}\n\n")
         x = self.fully_connected_layer(x)
         return x
 
 
 torch.manual_seed(42)
-model=CNN(
-    input_shape = 3 ,
+model = CNN(
+    input_shape=3,
     output=len(classes)
 )
 
 in_shape = (3, 250, 250)
 
-criterion=nn.CrossEntropyLoss()
-optimizer=Adam(model.parameters(),lr=0.001)
+criterion = nn.CrossEntropyLoss()
+optimizer = Adam(model.parameters(), lr=0.001)
 
 epochs = 10
 training_acc = []
@@ -373,16 +346,15 @@ for i in tqdm(range(epochs)):
     print(
         f"Epoch {i}: Accuracy: {(epoch_acc / len(train_dataloader)) * 100}, Loss: {(epoch_loss / len(train_dataloader))}\n\n")
 
-
-plt.subplots(figsize=(6,4))
-plt.plot(range(epochs),training_loss,color="blue",label="Loss")
+plt.subplots(figsize=(6, 4))
+plt.plot(range(epochs), training_loss, color="blue", label="Loss")
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
-plt.subplots(figsize=(6,4))
-plt.plot(range(epochs),training_acc,color="green",label="Accuracy")
+plt.subplots(figsize=(6, 4))
+plt.plot(range(epochs), training_acc, color="green", label="Accuracy")
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
@@ -410,4 +382,45 @@ test_preds = torch.cat(test_preds)
 test_targets = torch.Tensor(test_targets)
 
 print(f"The loss of the testing set is : {test_loss}\n")
-print(f"The accuracy of the testing set is : {(test_acc*100):0.2f}%\n")
+print(f"The accuracy of the testing set is : {(test_acc * 100):0.2f}%\n")
+
+y_preds = []
+
+torch.manual_seed(42)
+with torch.no_grad():
+    for x in pred_dataloader:
+        y_pred = model.forward(x)
+
+        y_pred = torch.softmax(y_pred, dim=1).argmax(dim=1)
+        y_preds.append(y_pred)
+
+y_preds = torch.cat(y_preds)
+
+x_preds_samples = next(iter(pred_dataloader))
+x_preds_samples.shape
+
+fig, axis = plt.subplots(3, 5, figsize=(35, 20))
+for i, ax in enumerate(axis.flat):
+    with torch.no_grad():
+        img = x_preds_samples[i].numpy()
+        img = np.transpose(img, (1, 2, 0))
+        ax.imshow(img)
+        ax.set(title=f"Predicted : {getlabel(y_preds[i])}\nTrue : {getlabel(pred_labels[i])}")
+        ax.axis('off')
+
+print(f"The accuracy of the training set is : {(training_acc[-1] * 100):0.2f}%")
+print(f"The accuracy of the testing set is : {(test_acc * 100):0.2f}%\n")
+print(f"\nRecall : {recall_score(test_targets, test_preds, average='weighted')}")
+print(f"\nPrecision : {precision_score(test_targets, test_preds, average='weighted')}")
+print(f"\nF1 Score {f1_score(test_targets, test_preds, average='weighted')}\n")
+
+confmat = ConfusionMatrix(num_classes=len(classes), task='multiclass')
+confmat_tensor = confmat(preds=test_preds,
+                         target=test_targets)
+
+fig, ax = plot_confusion_matrix(
+    conf_mat=confmat_tensor.numpy(),
+    class_names=classes,
+    figsize=(10, 7)
+)
+torch.save(model.state_dict(), 'lung-and-colon-cancer-classification.pt')
