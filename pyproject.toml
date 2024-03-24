@@ -18,6 +18,12 @@ linearregression = "^0.0.1"
 opencv-python-headless = "^4.9.0.80"
 cv = "^1.0.0"
 opencv-python = "^4.9.0.80"
+tqdm = "^4.66.2"
+torch = "^2.2.1"
+torchvision = "^0.17.1"
+torchsummary = "^1.5.1"
+torchmetrics = "^1.3.2"
+mlxtend = "^0.23.1"
 
 
 
