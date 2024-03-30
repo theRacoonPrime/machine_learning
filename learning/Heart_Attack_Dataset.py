@@ -29,12 +29,21 @@ df = pd.read_csv('/Users/andrey/Downloads/Medicaldataset.csv')
 # plt.show()
 
 
+# plt.figure(figsize=(10, 6))
+# sns.kdeplot(df['Systolic blood pressure'], shade=True, color='orange', label='Systolic BP')
+# sns.kdeplot(df['Diastolic blood pressure'], shade=True, color='purple', label='Diastolic BP')
+# plt.title('Blood Pressure Distribution')
+# plt.xlabel('Blood Pressure')
+# plt.ylabel('Density')
+# plt.legend()
+# plt.show()
+
+
 plt.figure(figsize=(10, 6))
-sns.kdeplot(df['Systolic blood pressure'], shade=True, color='orange', label='Systolic BP')
-sns.kdeplot(df['Diastolic blood pressure'], shade=True, color='purple', label='Diastolic BP')
-plt.title('Blood Pressure Distribution')
-plt.xlabel('Blood Pressure')
-plt.ylabel('Density')
-plt.legend()
+sns.histplot(df['Blood sugar'], bins=20, kde=True, color='green')
+plt.title('Blood Sugar Distribution')
+plt.xlabel('Blood Sugar')
+plt.ylabel('Frequency')
 plt.show()
+
 
