@@ -55,9 +55,17 @@ df = pd.read_csv('/Users/andrey/Downloads/Medicaldataset.csv')
 # plt.show()
 
 # Troponin distribution
-plt.figure(figsize=(10, 6))
-sns.histplot(df['Troponin'], bins=20, kde=True, color='red')
-plt.title('Troponin Distribution')
-plt.xlabel('Troponin')
-plt.ylabel('Frequency')
+# plt.figure(figsize=(10, 6))
+# sns.histplot(df['Troponin'], bins=20, kde=True, color='red')
+# plt.title('Troponin Distribution')
+# plt.xlabel('Troponin')
+# plt.ylabel('Frequency')
+# plt.show()
+
+# Result Distribution
+plt.figure(figsize=(6, 6))
+sns.countplot(x='Result', data=df, palette='pastel')
+plt.title('Result Distribution')
+plt.xlabel('Result')
+plt.ylabel('Count')
 plt.show()
