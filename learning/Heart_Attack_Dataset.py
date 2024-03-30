@@ -21,9 +21,20 @@ df = pd.read_csv('/Users/andrey/Downloads/Medicaldataset.csv')
 # plt.show()
 
 
+# plt.figure(figsize=(10, 6))
+# sns.histplot(df['Heart rate'], bins=20, kde=True, color='salmon')
+# plt.title('Heart Rate Distribution')
+# plt.xlabel('Heart Rate')
+# plt.ylabel('Frequency')
+# plt.show()
+
+
 plt.figure(figsize=(10, 6))
-sns.histplot(df['Heart rate'], bins=20, kde=True, color='salmon')
-plt.title('Heart Rate Distribution')
-plt.xlabel('Heart Rate')
-plt.ylabel('Frequency')
+sns.kdeplot(df['Systolic blood pressure'], shade=True, color='orange', label='Systolic BP')
+sns.kdeplot(df['Diastolic blood pressure'], shade=True, color='purple', label='Diastolic BP')
+plt.title('Blood Pressure Distribution')
+plt.xlabel('Blood Pressure')
+plt.ylabel('Density')
+plt.legend()
 plt.show()
+
