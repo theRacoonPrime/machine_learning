@@ -39,11 +39,25 @@ df = pd.read_csv('/Users/andrey/Downloads/Medicaldataset.csv')
 # plt.show()
 
 
+# plt.figure(figsize=(10, 6))
+# sns.histplot(df['Blood sugar'], bins=20, kde=True, color='green')
+# plt.title('Blood Sugar Distribution')
+# plt.xlabel('Blood Sugar')
+# plt.ylabel('Frequency')
+# plt.show()
+
+
+# plt.figure(figsize=(10, 6))
+# sns.histplot(df['CK-MB'], bins=20, kde=True, color='blue')
+# plt.title('CK-MB Distribution')
+# plt.xlabel('CK-MB')
+# plt.ylabel('Frequency')
+# plt.show()
+
+# Troponin distribution
 plt.figure(figsize=(10, 6))
-sns.histplot(df['Blood sugar'], bins=20, kde=True, color='green')
-plt.title('Blood Sugar Distribution')
-plt.xlabel('Blood Sugar')
+sns.histplot(df['Troponin'], bins=20, kde=True, color='red')
+plt.title('Troponin Distribution')
+plt.xlabel('Troponin')
 plt.ylabel('Frequency')
 plt.show()
-
-
