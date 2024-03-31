@@ -1,18 +1,69 @@
 import os
-import numpy as np
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow.keras import layers
-import tensorflow.keras as keras
-import tensorflow.keras
 import cv2
-from sklearn.model_selection import train_test_split
-import keras_cv
+from tqdm.notebook import tqdm
+import tensorflow as tf
+# from tensorflow.keras import *
+# from tensorflow.keras.optimizers import AdamW
+# from tensorflow.keras.callbacks import Callback
+# import keras_cv
 
 
-path_image = "/kaggle/input/medical-image-dataset-brain-tumor-detection/Brain Tumor " \
-             "Detection/test/images/volume_100_slice_47_jpg.rf.5a4036c4db721c7a2501e756d91915a6.jpg "
-path_label = "/kaggle/input/medical-image-dataset-brain-tumor-detection/Brain Tumor " \
-             "Detection/test/labels/volume_100_slice_47_jpg.rf.5a4036c4db721c7a2501e756d91915a6.txt "
+BATCH_SIZE = 4
+GLOBAL_CLIPNORM = 10.0
+
+AUTO = tf.data.AUTOTUNE
+
+
+def parse_txt_annot(img_path, txt_path):
+    img = cv2.imread(img_path)
+    w = int(img.shape[0])
+    h = int(img.shape[1])
+
+    file_label = open(txt_path, "r")
+    lines = file_label.read().split('\n')
+
+    boxes = []
+    classes = []
+
+    if lines[0] == '':
+        return img_path, classes, boxes
+    else:
+        for i in range(0, int(len(lines))):
+            objbud = lines[i].split(' ')
+            class_ = int(objbud[0])
+
+            x1 = float(objbud[1])
+            y1 = float(objbud[2])
+            w1 = float(objbud[3])
+            h1 = float(objbud[4])
+
+            xmin = int((x1 * w) - (w1 * w) / 2.0)
+            ymin = int((y1 * h) - (h1 * h) / 2.0)
+            xmax = int((x1 * w) + (w1 * w) / 2.0)
+            ymax = int((y1 * h) + (h1 * h) / 2.0)
+
+            boxes.append([xmin, ymin, xmax, ymax])
+            classes.append(class_)
+
+    return img_path, classes, boxes
+
+
+# a function for creating file paths list
+def create_paths_list(path):
+    full_path = []
+    images = sorted(os.listdir(path))
+
+    for i in images:
+        full_path.append(os.path.join(path, i))
+
+    return full_path
+
+
+class_ids = ['label0', 'label1', 'label2']
+class_mapping = dict(zip(range(len(class_ids)), class_ids))
+
+print(class_mapping)
 
