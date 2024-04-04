@@ -8,7 +8,6 @@ import cv2
 from skimage.io import imread
 import dicom
 import warnings
-from google.colab.patches import cv2_imshow
 warnings.filterwarnings("ignore")
 
 
@@ -16,7 +15,7 @@ pathway = "/Users/andrey/Downloads/archive"
 data_df = pd.read_csv(os.path.join(pathway, "overview.csv"))
 
 # print("Number of TIFF Images:", len(os.listdir(os.path.join(pathway, "tiff_images"))))
-tiff_data = pd.DataFrame([{'path': filepath} for filepath in glob(pathway + '/tiff_images/*.tif')])
+# tiff_data = pd.DataFrame([{'path': filepath} for filepath in glob(pathway + '/tiff_images/*.tif')])
 
 
 def process_data(path):
