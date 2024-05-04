@@ -71,7 +71,7 @@ resized = cv2.resize(dicomImg[0], dim, interpolation=cv2.INTER_CUBIC)
 # cv2_imshow(resized)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-cv2_imshow()
+# cv2_imshow()
 
 tiffImg = []
 for i in range(len(tiff_data)):
@@ -127,4 +127,4 @@ for i in range(len(dicom_data)):
     shapedData.append(normalizedImg[i].reshape(-1)/ 255.0)
     shapedData_tiff.append(normalizedImg_tiff[i].reshape(-1)/ 255.0)
 
-print(shapedData[0])
+# print(shapedData[0])

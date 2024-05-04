@@ -40,7 +40,7 @@ walk_through_data(pred_path)
 
 extension = []
 for cat in tqdm(os.listdir(dataset_path)):
-    for folder in os.listdir(dataset_path + "/" + cat) :
+    for folder in os.listdir(dataset_path + "/" + cat):
         for file in os.listdir(dataset_path + "/" + cat + "/" + folder + "/") :
             if os.path.isfile(dataset_path + "/" + cat + "/" + folder + "/" + file):
                 extension.append(os.path.splitext(file)[1])
