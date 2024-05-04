@@ -15,7 +15,6 @@ for dirname, _, filenames in os.walk('/Users/andrey/Downloads/brain_mri_scan_ima
 
 
 positive_folder = "/Users/andrey/Downloads/brain_mri_scan_images/positive"  # Path for positive folder
-
 negative_folder = "/Users/andrey/Downloads/brain_mri_scan_images/negative"      # Path for negative folder
 
 

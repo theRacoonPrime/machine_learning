@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "machine-learning-2"
+name = "my-project"
 version = "0.1.0"
 description = ""
 authors = ["Andrey Stoletov <stoletov314@gmail.com>"]
@@ -24,7 +24,6 @@ torchvision = "^0.17.1"
 torchsummary = "^1.5.1"
 torchmetrics = "^1.3.2"
 mlxtend = "^0.23.1"
-
 
 [build-system]
 requires = ["poetry-core"]
