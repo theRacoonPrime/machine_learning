@@ -17,6 +17,7 @@ for dirname, _, filenames in os.walk('/Users/andrey/Downloads/brain_mri_scan_ima
 positive_folder = "/Users/andrey/Downloads/brain_mri_scan_images/positive"  # Path for positive folder
 negative_folder = "/Users/andrey/Downloads/brain_mri_scan_images/negative"      # Path for negative folder
 
+
 # Function to load and display an image
 def load_and_display_image(folder, label):
     img_name = os.listdir(folder)[0]  # Assuming there's at least one image in each folder
@@ -33,8 +34,10 @@ def load_and_display_image(folder, label):
 # Load and display a sample positive image
 load_and_display_image(positive_folder, "Positive")
 
+
 # Load and display a sample negative image
 load_and_display_image(negative_folder, "Negative")
+
 
 # Function to preprocess images
 def preprocess_images(folder, label, image_size=(224, 224)):

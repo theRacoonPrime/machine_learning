@@ -3,20 +3,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from tqdm.notebook import tqdm
+from tqdm.notebook import tqdm  # Importing tqdm for progress bars
 import tensorflow as tf
-# from tensorflow.keras import *
-# from tensorflow.keras.optimizers import AdamW
-# from tensorflow.keras.callbacks import Callback
-# import keras_cv
 
+BATCH_SIZE = 4  # Batch size for training
+GLOBAL_CLIPNORM = 10.0  # Global clipnorm value for gradient clipping
 
-BATCH_SIZE = 4
-GLOBAL_CLIPNORM = 10.0
+AUTO = tf.data.AUTOTUNE  # Autotune parameter for performance optimization
 
-AUTO = tf.data.AUTOTUNE
-
-
+# Function to parse text annotations
 def parse_txt_annot(img_path, txt_path):
     img = cv2.imread(img_path)
     w = int(img.shape[0])
@@ -50,8 +45,7 @@ def parse_txt_annot(img_path, txt_path):
 
     return img_path, classes, boxes
 
-
-# a function for creating file paths list
+# Function to create a list of file paths
 def create_paths_list(path):
     full_path = []
     images = sorted(os.listdir(path))
@@ -61,9 +55,10 @@ def create_paths_list(path):
 
     return full_path
 
-
+# Mapping class ids to class labels
 class_ids = ['label0', 'label1', 'label2']
 class_mapping = dict(zip(range(len(class_ids)), class_ids))
 
 print(class_mapping)
+
 
