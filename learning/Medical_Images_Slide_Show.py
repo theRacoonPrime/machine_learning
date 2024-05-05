@@ -10,13 +10,8 @@ import dicom
 import warnings
 warnings.filterwarnings("ignore")
 
-
 pathway = "/Users/andrey/Downloads/archive"
 data_df = pd.read_csv(os.path.join(pathway, "overview.csv"))
-
-# print("Number of TIFF Images:", len(os.listdir(os.path.join(pathway, "tiff_images"))))
-# tiff_data = pd.DataFrame([{'path': filepath} for filepath in glob(pathway + '/tiff_images/*.tif')])
-
 
 def process_data(path):
     data = pd.DataFrame([{'Path': filepath} for filepath in glob(pathway + path)])
@@ -27,10 +22,8 @@ def process_data(path):
     data['Modality'] = data['File'].map(lambda x: str(x.split('_')[6].split('.')[-2]))
     return data
 
-
 tiff_data = process_data('/tiff_images/*.tif')
 dicom_data = process_data('/dicom_dir/*.dcm')
-
 
 def countplot_comparison(feature):
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 4))
@@ -45,86 +38,31 @@ def countplot_comparison(feature):
 
     plt.show()
 
-
-# a function that read an image
 def readImg(img):
     # Load the input image
     image = imread(img)
     return image
 
-
-dicomImg = []
-for i in range(len(dicom_data)):
-    dicomImg.append(readImg(dicom_data["Path"][i]))
-
-
-# print('Original Dimensions : ', dicomImg[0].shape)
+dicomImg = [readImg(path) for path in dicom_data["Path"]]
+tiffImg = [readImg(path) for path in tiff_data["Path"]]
 
 image_size = 256
 dim = (image_size, image_size)
-
-# resize image
-resized = cv2.resize(dicomImg[0], dim, interpolation=cv2.INTER_CUBIC)
-
-# print('Resized Dimensions : ', resized.shape)
-
-# cv2_imshow(resized)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-# cv2_imshow()
-
-tiffImg = []
-for i in range(len(tiff_data)):
-    tiffImg.append(readImg(tiff_data["Path"][i]))
-
-
-# print('Original Dimensions : ', tiffImg[0].shape)
-
-
-image_size = 256
-dim = (image_size, image_size)
-
-# resize image
-resized = cv2.resize(tiffImg[0], dim, interpolation=cv2.INTER_CUBIC)
-
-# print('Resized Dimensions : ', resized.shape)
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
 
 def resize(img):
     resized = cv2.resize(img, dim, interpolation=cv2.INTER_CUBIC)
-    #cv2.imshow('Resized', resized)
-    #cv2.waitKey(0)
     return resized
 
-
-resizedImg = []
-resizedImg_tiff = []
-for i in range(len(dicom_data)):
-    resizedImg.append(resize(dicomImg[i]))
-    resizedImg_tiff.append(resize(tiffImg[i]))
-
-# print(resizedImg[0].shape)
-
+resizedImg = [resize(img) for img in dicomImg]
+resizedImg_tiff = [resize(img) for img in tiffImg]
 
 def normalize(img):
     normalized = cv2.normalize(img, None, alpha=0, beta=200, norm_type=cv2.NORM_MINMAX)
     return normalized
 
+normalizedImg = [normalize(img) for img in resizedImg]
+normalizedImg_tiff = [normalize(img) for img in resizedImg_tiff]
 
-normalizedImg = []
-normalizedImg_tiff = []
-for i in range(len(dicom_data)):
-    normalizedImg.append(normalize(resizedImg[i]))
-    normalizedImg_tiff.append(normalize(resizedImg_tiff[i]))
+shapedData = [img.reshape(-1)/ 255.0 for img in normalizedImg]
+shapedData_tiff = [img.reshape(-1)/ 255.0 for img in normalizedImg_tiff]
 
-
-shapedData = []
-shapedData_tiff = []
-for i in range(len(dicom_data)):
-    shapedData.append(normalizedImg[i].reshape(-1)/ 255.0)
-    shapedData_tiff.append(normalizedImg_tiff[i].reshape(-1)/ 255.0)
-
-# print(shapedData[0])
