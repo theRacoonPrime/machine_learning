@@ -8,16 +8,16 @@ from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.models import Model
 
-
+# Walk through the directory and print the path of each file
 for dirname, _, filenames in os.walk('/Users/andrey/Downloads/brain_mri_scan_images'):
     for filename in filenames:
         print(os.path.join(dirname, filename))
 
-
+# Define paths for positive and negative image folders
 positive_folder = "/Users/andrey/Downloads/brain_mri_scan_images/positive"  # Path for positive folder
 negative_folder = "/Users/andrey/Downloads/brain_mri_scan_images/negative"      # Path for negative folder
 
-
+# Function to load and display an image
 def load_and_display_image(folder, label):
     img_name = os.listdir(folder)[0]  # Assuming there's at least one image in each folder
     img_path = os.path.join(folder, img_name)
@@ -30,14 +30,13 @@ def load_and_display_image(folder, label):
     plt.axis('off')
     plt.show()
 
-
 # Load and display a sample positive image
 load_and_display_image(positive_folder, "Positive")
 
 # Load and display a sample negative image
 load_and_display_image(negative_folder, "Negative")
 
-
+# Function to preprocess images
 def preprocess_images(folder, label, image_size=(224, 224)):
     data = []
     labels = []
@@ -54,21 +53,20 @@ def preprocess_images(folder, label, image_size=(224, 224)):
 
     return np.array(data), np.array(labels)
 
-
 # Preprocess positive images
 positive_data, positive_labels = preprocess_images(positive_folder, 1)
 
 # Preprocess negative images
 negative_data, negative_labels = preprocess_images(negative_folder, 0)
 
-
+# Load the VGG16 model pre-trained on ImageNet
 base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
 
 # Freeze the convolutional layers
 for layer in base_model.layers:
     layer.trainable = False
 
-# Add your own classification layers on top
+# Add new classification layers on top of VGG16
 x = GlobalAveragePooling2D()(base_model.output)
 x = Dense(64, activation='relu')(x)
 predictions = Dense(1, activation='sigmoid')(x)
@@ -78,3 +76,4 @@ model_transfer = Model(inputs=base_model.input, outputs=predictions)
 
 # Compile the model
 model_transfer.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
