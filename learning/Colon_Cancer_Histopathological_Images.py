@@ -1,7 +1,7 @@
 import warnings
 import pandas as pd
 import numpy as np
-from tqdm.auto import tqdm
+from tqdm.auto import tqdm  # Importing tqdm for progress bars
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
@@ -27,24 +27,27 @@ from sklearn.model_selection import train_test_split
 warnings.filterwarnings('ignore')
 
 
+# Function to walk through the data directory
 def walk_through_data(dir_path):
-    for dirpath, dirnames, filenames in tqdm(os.walk(dir_path)) :
-        print(f"There are {len(dirnames)} directions and {len(filenames)} images in {dirpath}")
+    for dirpath, dirnames, filenames in tqdm(os.walk(dir_path)):
+        print(f"There are {len(dirnames)} directories and {len(filenames)} images in {dirpath}")
 
 
-dataset_path ='/Users/andrey/Downloads/lung_colon_image_set'
+dataset_path = '/Users/andrey/Downloads/lung_colon_image_set'
 pred_path = '/Users/andrey/Downloads/lung_colon_image_set'
 
-walk_through_data(dataset_path)
-walk_through_data(pred_path)
+walk_through_data(dataset_path)  # Walk through the dataset directory
+walk_through_data(pred_path)  # Walk through the prediction directory
 
+# Gather file extensions
 extension = []
 for cat in tqdm(os.listdir(dataset_path)):
     for folder in os.listdir(dataset_path + "/" + cat):
-        for file in os.listdir(dataset_path + "/" + cat + "/" + folder + "/") :
+        for file in os.listdir(dataset_path + "/" + cat + "/" + folder + "/"):
             if os.path.isfile(dataset_path + "/" + cat + "/" + folder + "/" + file):
                 extension.append(os.path.splitext(file)[1])
 
+# Gather categories and classes
 categories = []
 classes = []
 for cat in tqdm(os.listdir(dataset_path)):
@@ -55,6 +58,7 @@ for cat in tqdm(os.listdir(dataset_path)):
         if folder not in classes:
             classes.append(folder)
 
+# Mapping classes to numerical labels
 img_label = {}
 for key in categories:
     dic = {}
@@ -63,25 +67,27 @@ for key in categories:
             dic[value] = classes.index(value)
     img_label[key] = dic
 
-def getlabel(n):
+
+# Function to get label from numerical value
+def get_label(n):
     for i, j in img_label.items():
         for x, y in j.items():
             if n == y:
                 return i, x
 
 
-getlabel(1)
+get_label(1)  # Testing get_label function
 
-
+# Count number of images per class
 num_of_disease = {}
-
-for cat in tqdm(os.listdir(dataset_path)) :
-    for folder in os.listdir(dataset_path + "/" + cat) :
+for cat in tqdm(os.listdir(dataset_path)):
+    for folder in os.listdir(dataset_path + "/" + cat):
         num_of_disease[folder] = len(os.listdir(dataset_path + "/" + cat + "/" + folder))
 
+# Create DataFrame to visualize number of images per class
+img_per_class = pd.DataFrame(num_of_disease.values(), index=num_of_disease.keys(), columns=["# of images"])
 
-img_per_class = pd.DataFrame(num_of_disease.values(), index = num_of_disease.keys(), columns=["# of images"])
-
+# Plot the number of images per class
 idx = [i for i in range(len(classes))]
 plt.figure(figsize=(20, 10))
 plt.bar(idx, [n for n in num_of_disease.values()], width=0.5)
@@ -90,8 +96,8 @@ plt.ylabel('# of images')
 plt.xticks(idx, classes, fontsize=5, rotation=90)
 plt.title('Images per each class of plant disease')
 
-
-dataset_path_list=[]
+# Create a list of image paths and labels for the dataset
+dataset_path_list = []
 dataset_labels = []
 for cat in tqdm(os.listdir(dataset_path)):
     for folder in os.listdir(dataset_path + "/" + cat):
@@ -100,11 +106,13 @@ for cat in tqdm(os.listdir(dataset_path)):
             dataset_path_list.append(file)
             dataset_labels.append(img_label[cat.replace('_image_sets', '')][folder])
 
-img_size = 250
+# Split dataset into training and testing sets
+img_size = 250  # Image size for resizing
 
-train_path_list , test_path_list , train_labels , test_labels = train_test_split(dataset_path_list , dataset_labels ,
-                                                                                 train_size=0.80 , random_state=0)
+train_path_list, test_path_list, train_labels, test_labels = train_test_split(dataset_path_list, dataset_labels,
+                                                                              train_size=0.80, random_state=0)
 
+# Define basic transformations
 basic_transform = transforms.Compose([
     transforms.Resize(size=(img_size, img_size)),
     transforms.ToTensor()
@@ -119,6 +127,7 @@ class InvalidDatasetException(Exception):
         )
 
 
+# Define custom dataset class for training data
 class train_data(Dataset):
     def __init__(self, train_path, train_label, transform_method):
         self.train_path = train_path
@@ -138,10 +147,10 @@ class train_data(Dataset):
         return tensor_image, label
 
 
-train_set = train_data(train_path_list , train_labels , basic_transform)
-filer_train_image=train_set.__getitem__(1000)
+train_set = train_data(train_path_list, train_labels, basic_transform)
+filer_train_image = train_set.__getitem__(1000)  # Get a sample training image
 
-
+# Define custom dataset class for testing data
 class test_data(Dataset):
     def __init__(self, test_path, test_label, transform_method):
         self.test_path = test_path
@@ -161,10 +170,10 @@ class test_data(Dataset):
         return tensor_image, label
 
 
-test_set = test_data(test_path_list , test_labels , basic_transform)
-filer_test_image = test_set.__getitem__(2000)
+test_set = test_data(test_path_list, test_labels, basic_transform)
+filer_test_image = test_set.__getitem__(2000)  # Get a sample testing image
 
-
+# Define custom dataset class for prediction data
 class pred_data(Dataset):
     def __init__(self, pred_path, transform_method):
         self.pred_path = pred_path
@@ -180,5 +189,7 @@ class pred_data(Dataset):
         return tensor_image
 
 
-pred_set = pred_data(train_path_list , basic_transform)
+pred_set = pred_data(train_path_list, basic_transform)
 print(f"The number of images in the pred set is : {pred_set.__len__()}")
+
+
