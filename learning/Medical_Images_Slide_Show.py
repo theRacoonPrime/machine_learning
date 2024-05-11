@@ -19,6 +19,7 @@ data_df = pd.read_csv(os.path.join(pathway, "overview.csv"))
 
 # Function to process image data
 
+
 def process_data(path):
     data = pd.DataFrame([{'Path': filepath} for filepath in glob(pathway + path)])
     data['File'] = data['Path'].map(os.path.basename)
@@ -29,6 +30,7 @@ def process_data(path):
     return data
 
 # Process TIFF image data
+
 
 tiff_data = process_data('/tiff_images/*.tif')
 
@@ -43,6 +45,7 @@ def readImg(img):
 
 # Read DICOM images
 
+
 dicomImg = [readImg(path) for path in dicom_data["Path"]]
 
 # Read TIFF images
@@ -52,12 +55,16 @@ tiffImg = [readImg(path) for path in tiff_data["Path"]]
 image_size = 256
 dim = (image_size, image_size)
 
+
 def resize(img):
     resized = cv2.resize(img, dim, interpolation=cv2.INTER_CUBIC)
     return resized
 
 # Resize DICOM images
+
+
 resizedImg = [resize(img) for img in dicomImg]
+
 
 # Resize TIFF images
 resizedImg_tiff = [resize(img) for img in tiffImg]

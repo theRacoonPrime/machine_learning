@@ -26,7 +26,9 @@ def create_paths_list(path):
 
 # Mapping class ids to class labels
 
+
 class_ids = ['label0', 'label1', 'label2']
+
 class_mapping = dict(zip(range(len(class_ids)), class_ids))
 
 print(class_mapping)
