@@ -13,7 +13,6 @@ from keras.regularizers import l2
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 
-import matplotlib.pyplot as plt
 import random
 
 path = '/Users/andrey/Downloads/brain_mri_scan_images 2'
@@ -36,3 +35,10 @@ pos_img_1 = plt.imread(os.sep.join(positive_dir + [random_positive_images[0]]))
 pos_img_2 = plt.imread(os.sep.join(positive_dir + [random_positive_images[1]]))
 neg_img_1 = plt.imread(os.sep.join(negative_dir + [random_negative_images[0]]))
 neg_img_2 = plt.imread(os.sep.join(negative_dir + [random_negative_images[1]]))
+
+plt.figure(figsize=(10, 10))
+
+plt.subplot(2, 2, 1)
+plt.imshow(pos_img_1)
+plt.title('Positive Image 1')
+plt.axis('off')
